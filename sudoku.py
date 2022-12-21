@@ -2,6 +2,8 @@ from random import randint
 import time
 import re
 
+#This function calculates the current block in the generation and returns the matching list with the current block
+#row and column are the indexs for current row and column, blocks is the list containing all the blocks and dimensions is the sudoku dimension (4, 6 or 9)
 def insert_into_block(row, column, blocks, dimensions):
     #9x9 block distribution
     if dimensions == 9:
@@ -59,6 +61,9 @@ def insert_into_block(row, column, blocks, dimensions):
     else:
         print(f'Error in insert_into_block function: No matching dimensions. Value for dimensions is {dimensions} .')
 
+#Generates a sudoku of 9x9, 6x6 or 4x4 depending on the dimensions value (9, 6 or 4). The print_me parameter prints the generated sudoku if it's True and
+# does nothing if it's False.
+#The function returns the generated rows (enough to allow sudoku storage and reading).
 def gen_sudoku(print_me, dimensions):
     rows, columns, blocks = [], [], []
     for i in range(dimensions):
@@ -134,6 +139,7 @@ def gen_sudoku(print_me, dimensions):
             print(row)
     return rows
 
+#Export a number of sudokus with the selected dimensions to a txt file. Generates different files for 4, 6 and 9 dimensions.
 def export_sudokus(number, dimensions):
     try:
         tic = time.time()
@@ -149,9 +155,10 @@ def export_sudokus(number, dimensions):
     except:
         print('Error. Dimensions must be 4, 6 or 9 and number of sudokus generated must be greater than zero.')
 
+#Reads all the sudokus from a txt file (with the format created by this generator, other formats will return an exception).
 def read_sudokus(path):
     try:
-        with open (f'{path}.txt', 'r') as sudokus:
+        with open (f'{path}', 'r') as sudokus:
             for i, line in enumerate(sudokus):
                 formatted_sudoku = re.split('(?<=]),', line)
                 formatted_sudoku.pop(-1)
@@ -162,12 +169,12 @@ def read_sudokus(path):
     except:
         print('Incorrect file or path.')
 
-#We need to format using regex in order to avoid the 8] and 6[ characters. LookBehind and LookAfter regex makes this possible
+#Reads sudokus from a sudoku txt file and returns a random one. 
 def pick_sudoku(path):
     tic = time.time()
     try:
         MAX_SUDOKUS = number_of_sudokus(path)
-        with open (f'{path}.txt', 'r') as sudokus:
+        with open (f'{path}', 'r') as sudokus:
             chosen = randint(0, MAX_SUDOKUS-1)
             for i, line in enumerate(sudokus):
                 if(i == chosen):
@@ -182,11 +189,13 @@ def pick_sudoku(path):
     except:
         print('Incorrect file or path.')
 
+#Calculates the number of sudokus contained in a txt file
 def number_of_sudokus(path):
     with open (f'{path}.txt', 'r') as sudokus:
         lines = sum(1 for line in sudokus)
         return lines
 
+#Main function
 def main():
     NINE_X_NINE = 9
     SIX_X_SIX = 6

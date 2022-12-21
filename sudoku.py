@@ -1,5 +1,6 @@
 from random import randint
 import time
+import re
 
 def insert_into_block(row, column, blocks):
     if (row<3):
@@ -24,7 +25,7 @@ def insert_into_block(row, column, blocks):
         else:
             return blocks[8]
 
-def gen_9x9_sudoku():
+def gen_9x9_sudoku(print_me):
     rows, columns, blocks = [], [], []
     for i in range(9):
         rows.append([]), columns.append([]), blocks.append([])
@@ -86,7 +87,9 @@ def gen_9x9_sudoku():
                     break
             if regen is True:
                 break
-
+    if print_me is True:
+        for row in rows:
+            print(row)
 
     toc = time.time()
     #print(f'El sudoku se ha generado en {round((toc-tic), 4)} segundos y es:')
@@ -107,10 +110,10 @@ def gen_4x4_sudoku():
 def export_sudokus(number, dimensions):
     try:
         tic = time.time()
-        with open ('sudokus.txt', 'w') as sudokus:
+        with open ('stuff/sudokus.txt', 'w') as sudokus:
             if dimensions == 9:
                 for i in range (number):
-                    rows = gen_9x9_sudoku()
+                    rows = gen_9x9_sudoku(False)
                     for row in rows:
                         sudokus.write(str(row))
                         sudokus.write(',')
@@ -136,16 +139,49 @@ def export_sudokus(number, dimensions):
 
 def read_sudokus(path):
     try:
-        with open (f'{path}.txt', 'r'):
-            print('Read sudokus')
+        with open (f'{path}.txt', 'r') as sudokus:
+            for i, line in enumerate(sudokus):
+                formatted_sudoku = re.split('(?<=]),', line)
+                formatted_sudoku.pop(-1)
+                print(f'Sudoku {i+1}:')
+                for row in formatted_sudoku:
+                    print(row)
+
     except:
         print('Incorrect file or path.')
 
+#We need to format using regex in order to avoid the 8] and 6[ characters. LookBehind and LookAfter regex makes this possible
+def pick_sudoku(path):
+    tic = time.time()
+    try:
+        MAX_SUDOKUS = number_of_sudokus(path)
+        with open (f'{path}.txt', 'r') as sudokus:
+            chosen = randint(0, MAX_SUDOKUS-1)
+            for i, line in enumerate(sudokus):
+                if(i == chosen):
+                    formatted_sudoku = re.split('(?<=]),', line)
+                    formatted_sudoku.pop(-1)
+                    toc = time.time()
+                    print(f'Time elapsed is {round(toc-tic, 5)} seconds')
+                    print(f'The chosen sudoku is {i+1} between the {MAX_SUDOKUS} available:')
+                    for row in formatted_sudoku:
+                        print(row)
+                    break
+    except:
+        print('Incorrect file or path.')
+
+def number_of_sudokus(path):
+    with open (f'{path}.txt', 'r') as sudokus:
+        lines = sum(1 for line in sudokus)
+        return lines
+
 def main():
     while(True):
-        option = input('Welcome to sudoku generator. What do you want to do?:\n1 - Generate a 9x9 sudoku\n2 - Generate a 6x6 sudoku\n3 - Generate a 4x4 sudoku\n4 - Export sudokus to a txt file\n5 - Read sudokus from a txt file\n6 - Exit\nType your option: ')
+        option = input('Welcome to sudoku generator. What do you want to do?:\n1 - Generate a 9x9 sudoku\n2 - Generate a 6x6 sudoku'+
+        '\n3 - Generate a 4x4 sudoku\n4 - Export sudokus to a txt file\n5 - Read sudokus from a txt file\n6 - Pick a random sudoku from a file\n'+
+        '7 - Exit\nType your option: ')
         if option == '1':
-            gen_9x9_sudoku()
+            gen_9x9_sudoku(True)
         elif option == '2':
             gen_6x6_sudoku()
         elif option == '3':
@@ -155,9 +191,12 @@ def main():
             dimensions = input('Enter the dimensions of the sudoku [4 to gen a 4x4, 6 to gen a 6x6 or 9 to gen a 9x9]: ') 
             export_sudokus(int(number), int(dimensions))
         elif option == '5':
-            path = input('Enter the path for the txt file you want to read:')
+            path = input('Enter the path for the txt file you want to read from:')
             read_sudokus(path)
         elif option == '6':
+            path = input('Enter the path for the txt file you want to read from:')
+            pick_sudoku(path)  
+        elif option == '7':
             print('See you soon!')
             quit()  
         else:

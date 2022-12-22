@@ -1,3 +1,4 @@
+import difflib
 from random import randint
 import time
 import re
@@ -62,7 +63,7 @@ def insert_into_block(row, column, blocks, dimensions):
         print(f'Error in insert_into_block function: No matching dimensions. Value for dimensions is {dimensions} .')
 
 #Generates a sudoku of 9x9, 6x6 or 4x4 depending on the dimensions value (9, 6 or 4). The print_me parameter prints the generated sudoku if it's True and
-# does nothing if it's False.
+#does nothing if it's False.
 #The function returns the generated rows (enough to allow sudoku storage and reading).
 def gen_sudoku(print_me, dimensions):
     rows, columns, blocks = [], [], []
@@ -169,41 +170,95 @@ def read_sudokus(path):
     except:
         print('Incorrect file or path.')
 
-#Reads sudokus from a sudoku txt file and returns a random one. 
+#Reads a sudoku from a sudoku txt file, parses the line using regex and formats it as a list of lists. After that returns the sudoku
 def pick_sudoku(path):
     tic = time.time()
     try:
+        string_sudoku = None
         MAX_SUDOKUS = number_of_sudokus(path)
         with open (f'{path}', 'r') as sudokus:
             chosen = randint(0, MAX_SUDOKUS-1)
             for i, line in enumerate(sudokus):
                 if(i == chosen):
-                    formatted_sudoku = re.split('(?<=]),', line)
-                    formatted_sudoku.pop(-1)
+                    string_sudoku = re.split('(?<=]),', line)
+                    string_sudoku.pop(-1)
                     toc = time.time()
                     print(f'Time elapsed is {round(toc-tic, 5)} seconds')
                     print(f'The chosen sudoku is {i+1} between the {MAX_SUDOKUS} available:')
-                    for row in formatted_sudoku:
+                    for row in string_sudoku:
                         print(row)
                     break
+        
+        #In order to return a list of lists, we have to parse the formatted sudoku from the type string
+        formatted_sudoku = []
+        for i, rows in enumerate(string_sudoku):
+            formatted_sudoku.append([])
+            for row in rows:
+                for cell in row:
+                    try:
+                        num = int(cell)
+                        formatted_sudoku[i].append(num)
+                    except:
+                        pass
+        return formatted_sudoku
     except:
         print('Incorrect file or path.')
 
 #Calculates the number of sudokus contained in a txt file
 def number_of_sudokus(path):
-    with open (f'{path}.txt', 'r') as sudokus:
+    with open (f'{path}', 'r') as sudokus:
         lines = sum(1 for line in sudokus)
         return lines
 
+#Generates a sketchy sudoku and returns it. First picks a sudoku of the chosen dimensions, then depending on the difficulty changes random values to zero.
+#More difficulty means more zeroes. 
+def gen_sketchy_sudoku(dimensions, difficulty):
+    if dimensions == 4:
+        path = 'sudokus4.txt'
+    elif dimensions == 6:
+        path = 'sudokus6.txt'
+    elif dimensions == 9:
+        path = 'sudokus9.txt'
+    else:
+        print('Wrong dimensions.')
+    tic = time.time()
+    sudoku = pick_sudoku(path)
+    sketchy_sudoku = []
+    for i, row in enumerate(sudoku):
+        sketchy_sudoku.append([])
+        for cell in row:
+            probability = randint(0,100)
+            if(probability>difficulty):
+                cell = 0
+            sketchy_sudoku[i].append(cell)
+    toc = time.time()
+    print(f'Sketchy sudoku has been generated in {round(toc-tic, 4)} seconds:')
+    for row in sketchy_sudoku:
+        print(row)
+    return sketchy_sudoku
+
+#Takes the answer of the user, parses it to a difficulty and returns it as an integer. If it's not a correct answer will return nothing.
+def pick_difficulty(difficulty):
+    level = difficulty.upper()
+    EASY, MEDIUM, HARD = 70, 50, 30
+    if level == 'EASY':
+        return EASY
+    elif level == 'MEDIUM':
+        return MEDIUM
+    elif level == 'HARD':
+        return HARD
+    else:
+        print(f'Wrong difficulty selected: {difficulty}')
 #Main function
 def main():
     NINE_X_NINE = 9
     SIX_X_SIX = 6
     FOUR_X_FOUR = 4
-    while(True):
+    run = True
+    while(run):
         option = input('Welcome to sudoku generator. What do you want to do?:\n1 - Generate a 9x9 sudoku\n2 - Generate a 6x6 sudoku'+
         '\n3 - Generate a 4x4 sudoku\n4 - Export sudokus to a txt file\n5 - Read sudokus from a txt file\n6 - Pick a random sudoku from a file\n'+
-        '7 - Exit\nType your option: ')
+        '7 - Generate an sketchy sudoku\n8 - Exit\nType your option: ')
         if option == '1':
             gen_sudoku(True, NINE_X_NINE)
         elif option == '2':
@@ -221,10 +276,18 @@ def main():
             path = input('Enter the path for the txt file you want to read from:')
             pick_sudoku(path)  
         elif option == '7':
+            dimensions = input("Enter the dimensions of the sudoku [4 to gen a 4x4, 6 to gen a 6x6 or 9 to gen a 9x9]: ")
+            level = input("Choose a level [Easy/Medium/Hard]: ")
+            difficulty = pick_difficulty(level)
+            try:
+                gen_sketchy_sudoku(int(dimensions), difficulty)
+            except:
+                print('Wrong dimensions or difficulty selected.')
+        elif option == '8':
             print('See you soon!')
-            quit()  
+            run = False
         else:
-            print('Invalid option. Type a number (1, 2, 3, 4, 5 or 6) to continue ')
+            print('Invalid option. Type a number (1, 2, 3, 4, 5, 6, 7, or 8) to continue ')
 
 if __name__ == "__main__":
     main()

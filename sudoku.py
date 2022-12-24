@@ -144,7 +144,7 @@ def gen_sudoku(print_me, dimensions):
 def export_sudokus(number, dimensions):
     try:
         tic = time.time()
-        with open (f'stuff/sudokus{dimensions}.txt', 'w') as sudokus:
+        with open (f'sudokus{dimensions}.txt', 'w') as sudokus:
             for i in range (number):
                 rows = gen_sudoku(False, dimensions)
                 for row in rows:

@@ -2,7 +2,7 @@ import pygame
 import sudoku 
 
 #Creating the window for the game. 
-WIDTH, HEIGHT = 800, 800
+WIDTH, HEIGHT = 730, 730
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 #Constants used in the game
 BACKGROUND_COLOR = ((133, 199, 242))

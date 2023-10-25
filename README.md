@@ -1,9 +1,6 @@
 Sudoku Generator creates sudokus from scratch as a matrix of 9x9, 6x6 or 4x4 items according to the rules of a valid sudoku. 
-<br><br>
-![sudokus](https://github.com/JVinuelas19/Sudoku-Generator/assets/111135343/f96b9dee-9a7c-4e32-85b8-70959e8bb342)
-<br><br>
 
-#Version 1.0
+# Version 1.0
 
 Features (sudoku.py):
 - Generates 9x9 sudokus.
@@ -18,4 +15,7 @@ Features (sudoku.py):
 The algorithm to create the sudokus it's made from scratch using recursive methods. 
 It also contains a very basic pygame example displaying a sketchy 9x9 sudoku with medium difficulty created by sudoku.py
 It will become a sudoku game anytime but in the meantime sudoku.py can be a useful tool for sudoku game devs!
+
+<br><br>
+![sudokus](https://github.com/JVinuelas19/Sudoku-Generator/assets/111135343/f96b9dee-9a7c-4e32-85b8-70959e8bb342)
 

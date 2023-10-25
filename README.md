@@ -1,3 +1,4 @@
+# Sudoku Generator
 Sudoku Generator creates sudokus from scratch as a matrix of 9x9, 6x6 or 4x4 items according to the rules of a valid sudoku. 
 
 # Version 1.0
